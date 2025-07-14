@@ -4,7 +4,7 @@
 
 This is an interactive hero image created with HTML Canvas. **Click the image above to see the live version.**
 
-# SAM - Spatial Analysis from Masks
+# S.A.M. - Spatial Analysis from Masks
 A suite of tools designed to streamline common image analysis tasks in scientific research.
 
 [![DOI: 10.5281/zenodo.15851666](https://img.shields.io/badge/DOI-10.5281/zenodo.15851666-blue.svg)](https://doi.org/10.5281/zenodo.15851666)
