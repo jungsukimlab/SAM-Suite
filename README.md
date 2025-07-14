@@ -7,7 +7,7 @@ This is an interactive hero image created with HTML Canvas. **Click the image ab
 # S.A.M. - Spatial Analysis from Masks
 A suite of tools designed to streamline common image analysis tasks in scientific research.
 
-[![DOI: 10.5281/zenodo.15851666](https://img.shields.io/badge/DOI-10.5281/zenodo.15851666-blue.svg)](https://doi.org/10.5281/zenodo.15851666)
+[![DOI: 10.5281/zenodo.15851666](https://img.shields.io/badge/DOI-10.5281/zenodo.15881978-blue.svg)](https://doi.org/10.5281/zenodo.15881978)
 [![Latest Release](https://img.shields.io/github/v/release/jungsukimlab/SAM-Suite?label=Latest%20Release&color=brightgreen)](https://github.com/jungsukimlab/SAM-Suite/releases)
 [![Issues](https://img.shields.io/github/issues/jungsukimlab/SAM-Suite)](https://github.com/jungsukimlab/SAM-Suite/issues)
 [![License: MIT](https://img.shields.io/badge/Docs%20License-MIT-purple.svg)](https://github.com/jungsukimlab/SAM-Suite/blob/main/LICENSE)
