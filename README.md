@@ -1,6 +1,6 @@
 # S.A.M. - Spatial Analysis from Masks
 
-[![S.A.M. Hero Preview](https://github.com/<Aviiation>/<Sam-Suite>/blob/main/hero_preview.png?raw=true)](https://<Aviiation>.github.io/<Sam-Suite>/SAM_Hero_Image.gif)
+[![S.A.M. Hero Preview](https://github.com/jungsukimlab/SAM-Suite/blob/main/SAM_Hero_Image.gif?raw=true)](https://jungsukimlab.github.io/SAM-Suite/hero_image.gif)
 
 This is an interactive hero image created with HTML Canvas. **Click the image above to see the live version.**
 
