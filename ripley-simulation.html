@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Ripley's L-Function Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a192f;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a192f; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+        input[type="range"] {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 4px;
+            background: #334155; border-radius: 5px;
+            outline: none; opacity: 0.7;
+            transition: opacity .2s;
+        }
+        input[type="range"]:hover { opacity: 1; }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 18px; height: 18px;
+            background: #64ffda; cursor: pointer;
+            border-radius: 50%; border: 2px solid #0a192f;
+            box-shadow: 0 0 5px #64ffda, 0 0 10px #64ffda;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 18px; height: 18px;
+            background: #64ffda; cursor: pointer;
+            border-radius: 50%; border: 2px solid #0a192f;
+            box-shadow: 0 0 5px #64ffda, 0 0 10px #64ffda;
+        }
+        .text-glow {
+            text-shadow: 0 0 8px rgba(100, 255, 218, 0.7);
+        }
+    </style>
+</head>
+<body class="text-slate-300">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-100 text-glow">Visualizing Glial Spatial Patterns with Ripley's L-Function</h1>
+            <p class="mt-3 text-md md:text-lg text-slate-400 max-w-3xl mx-auto">An interactive tool for neuroscientists to build intuition about plaque-centric spatial statistics.</p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+
+            <div class="w-full lg:w-1/3 bg-[#112240] p-6 rounded-lg shadow-2xl border border-slate-700">
+                <h2 class="text-xl font-semibold mb-6 border-b border-slate-700 pb-3 text-slate-200">Simulation Parameters</h2>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <label for="rc_slider" class="text-sm font-medium text-slate-300">Recruitment Zone (r<sub>c</sub>)</label>
+                            <span id="rc_value" class="text-sm font-semibold text-[#64ffda]">50 µm</span>
+                        </div>
+                        <input type="range" id="rc_slider" min="10" max="100" value="50" class="mt-2">
+                        <p class="text-xs text-slate-500 mt-1">The primary inflammatory zone where glia are densely recruited.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <label for="rd_slider" class="text-sm font-medium text-slate-300">Inhibitory Boundary (r<sub>d</sub>)</label>
+                            <span id="rd_value" class="text-sm font-semibold text-[#64ffda]">100 µm</span>
+                        </div>
+                        <input type="range" id="rd_slider" min="50" max="200" value="100" class="mt-2">
+                        <p class="text-xs text-slate-500 mt-1">Distance where inhibitory effects begin, causing glial depletion.</p>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <label for="nc_slider" class="text-sm font-medium text-slate-300">Recruitment Strength (n<sub>c</sub>)</label>
+                            <span id="nc_value" class="text-sm font-semibold text-[#64ffda]">80</span>
+                        </div>
+                        <input type="range" id="nc_slider" min="10" max="200" value="80" class="mt-2">
+                        <p class="text-xs text-slate-500 mt-1">Strength of the chemotactic response. More glia mean a stronger response.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <label for="nd_slider" class="text-sm font-medium text-slate-300">Far-Field Density (n<sub>d</sub>)</label>
+                            <span id="nd_value" class="text-sm font-semibold text-[#64ffda]">50</span>
+                        </div>
+                        <input type="range" id="nd_slider" min="0" max="150" value="50" class="mt-2">
+                        <p class="text-xs text-slate-500 mt-1">Glial density outside the inhibitory zone.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <label for="sigma_slider" class="text-sm font-medium text-slate-300">Cluster Tightness (σ)</label>
+                            <span id="sigma_value" class="text-sm font-semibold text-[#64ffda]">15</span>
+                        </div>
+                        <input type="range" id="sigma_slider" min="5" max="50" value="15" class="mt-2">
+                        <p class="text-xs text-slate-500 mt-1">How tightly glia are packed. Smaller values mean a denser cluster core.</p>
+                    </div>
+                </div>
+                 <div class="mt-8 text-center">
+                    <button id="rerun_button" class="font-semibold text-[#64ffda] border border-[#64ffda] py-2 px-6 rounded-md hover:bg-[#64ffda] hover:bg-opacity-10 transition-colors duration-300">
+                        Run New Simulation
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-2/3 bg-[#112240] p-4 rounded-lg shadow-2xl border border-slate-700">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                    <div class="bg-[#0a192f] rounded-lg p-2 flex flex-col">
+                         <h3 class="text-center font-semibold text-slate-400 mb-2">Generated Glial Distribution</h3>
+                         <canvas id="scatterCanvas" class="flex-grow"></canvas>
+                    </div>
+                    <div class="bg-[#0a192f] rounded-lg p-2 flex flex-col">
+                         <h3 class="text-center font-semibold text-slate-400 mb-2">Spatial Signature: L(d) - d</h3>
+                         <canvas id="lFunctionCanvas" class="flex-grow"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Element Selection ---
+        const scatterCanvas = document.getElementById('scatterCanvas');
+        const lFunctionCanvas = document.getElementById('lFunctionCanvas');
+        const scatterCtx = scatterCanvas.getContext('2d');
+        const lFunctionCtx = lFunctionCanvas.getContext('2d');
+
+        const sliders = {
+            rc: document.getElementById('rc_slider'),
+            rd: document.getElementById('rd_slider'),
+            nc: document.getElementById('nc_slider'),
+            nd: document.getElementById('nd_slider'),
+            sigma: document.getElementById('sigma_slider'),
+        };
+
+        const values = {
+            rc: document.getElementById('rc_value'),
+            rd: document.getElementById('rd_value'),
+            nc: document.getElementById('nc_value'),
+            nd: document.getElementById('nd_value'),
+            sigma: document.getElementById('sigma_value'),
+        };
+        
+        const rerunButton = document.getElementById('rerun_button');
+
+        // --- Simulation Parameters ---
+        const simParams = {
+            W: 500, H: 500, plaque_coord: [250, 250],
+            r_c: 50, r_d: 100, n_c: 80,
+            n_r: 100, n_d: 50, sigma: 15,
+        };
+
+        const analysisParams = { max_dist: 250, steps: 100 };
+
+        // --- Core Simulation Logic ---
+        function randomNormal() {
+            let u = 0, v = 0;
+            while(u === 0) u = Math.random();
+            while(v === 0) v = Math.random();
+            return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+        }
+
+        function generatePlaqueEnvironment(params) {
+            const plaque_coord = params.plaque_coord;
+            let cluster_points = [];
+            while (cluster_points.length < params.n_c) {
+                const x = randomNormal() * params.sigma + plaque_coord[0];
+                const y = randomNormal() * params.sigma + plaque_coord[1];
+                const dist = Math.sqrt((x - plaque_coord[0])**2 + (y - plaque_coord[1])**2);
+                if (dist <= params.r_c) cluster_points.push([x, y]);
+            }
+            const generateAnnulusCSR = (n_points, r_inner, r_outer, center) => {
+                let points = [];
+                for (let i = 0; i < n_points; i++) {
+                    const r = Math.sqrt(Math.random() * (r_outer**2 - r_inner**2) + r_inner**2);
+                    const angle = Math.random() * 2 * Math.PI;
+                    points.push([center[0] + r * Math.cos(angle), center[1] + r * Math.sin(angle)]);
+                }
+                return points;
+            };
+            const random_points = generateAnnulusCSR(params.n_r, params.r_c, params.r_d, plaque_coord);
+            const r_max = Math.min(params.W, params.H) / 2;
+            const dispersion_points = generateAnnulusCSR(params.n_d, params.r_d, r_max, plaque_coord);
+            return [plaque_coord, [...cluster_points, ...random_points, ...dispersion_points]];
+        }
+
+        function analyzeSpatialPattern(glia_coords, areaParams, analysisParams) {
+            const area = areaParams.W * areaParams.H;
+            const n = glia_coords.length;
+            if (n < 2) return [new Float32Array(0), new Float32Array(0)];
+            const d_range = new Float32Array(analysisParams.steps).map((_, i) => (i / (analysisParams.steps - 1)) * analysisParams.max_dist);
+            const k_values = new Float32Array(analysisParams.steps).fill(0);
+            const dists = [];
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    dists.push(Math.sqrt((glia_coords[i][0] - glia_coords[j][0])**2 + (glia_coords[i][1] - glia_coords[j][1])**2));
+                }
+            }
+            for (let k = 0; k < d_range.length; k++) {
+                const d = d_range[k];
+                if (d === 0) continue;
+                let count = dists.filter(dist => dist <= d).length;
+                k_values[k] = (count * 2 * area) / (n * (n - 1));
+            }
+            const l_diff = new Float32Array(analysisParams.steps);
+            for (let i = 0; i < d_range.length; i++) {
+                l_diff[i] = Math.sqrt(k_values[i] / Math.PI) - d_range[i];
+            }
+            return [d_range, l_diff];
+        }
+
+        // --- Drawing Logic ---
+        function drawScatterPlot(plaque_coord, glia_coords, params) {
+            const w = scatterCanvas.width;
+            const h = scatterCanvas.height;
+            scatterCtx.clearRect(0, 0, w, h);
+            
+            scatterCtx.strokeStyle = 'rgba(100, 255, 218, 0.25)';
+            scatterCtx.lineWidth = 1;
+            scatterCtx.setLineDash([4, 4]);
+            scatterCtx.beginPath();
+            scatterCtx.arc(w / 2, h / 2, params.r_c * (w / params.W), 0, 2 * Math.PI);
+            scatterCtx.stroke();
+            scatterCtx.beginPath();
+            scatterCtx.arc(w / 2, h / 2, params.r_d * (w / params.W), 0, 2 * Math.PI);
+            scatterCtx.stroke();
+            scatterCtx.setLineDash([]);
+
+            scatterCtx.fillStyle = 'rgba(100, 255, 218, 0.7)';
+            scatterCtx.shadowColor = '#64ffda';
+            scatterCtx.shadowBlur = 4;
+            for (const p of glia_coords) {
+                const x = p[0] * (w / params.W);
+                const y = p[1] * (h / params.H);
+                scatterCtx.beginPath();
+                scatterCtx.arc(x, y, 2, 0, 2 * Math.PI);
+                scatterCtx.fill();
+            }
+            scatterCtx.shadowBlur = 0;
+
+            const px = plaque_coord[0] * (w / params.W);
+            const py = plaque_coord[1] * (h / params.H);
+            scatterCtx.fillStyle = '#ffc300';
+            scatterCtx.strokeStyle = '#fff';
+            scatterCtx.lineWidth = 1.5;
+            scatterCtx.shadowColor = '#ffc300';
+            scatterCtx.shadowBlur = 15;
+            drawStar(px, py, 5, 15, 7);
+            scatterCtx.shadowBlur = 0;
+        }
+        
+        function drawStar(cx, cy, spikes, outerRadius, innerRadius) {
+            let rot = Math.PI / 2 * 3;
+            let x, y, step = Math.PI / spikes;
+            scatterCtx.beginPath();
+            scatterCtx.moveTo(cx, cy - outerRadius);
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rot) * outerRadius; y = cy + Math.sin(rot) * outerRadius;
+                scatterCtx.lineTo(x, y); rot += step;
+                x = cx + Math.cos(rot) * innerRadius; y = cy + Math.sin(rot) * innerRadius;
+                scatterCtx.lineTo(x, y); rot += step;
+            }
+            scatterCtx.lineTo(cx, cy - outerRadius);
+            scatterCtx.closePath();
+            scatterCtx.fill();
+            scatterCtx.stroke();
+        }
+
+        function drawLFunctionPlot(d_range, l_diff) {
+            const w = lFunctionCanvas.width;
+            const h = lFunctionCanvas.height;
+            lFunctionCtx.clearRect(0, 0, w, h);
+
+            const padding = 45;
+            const plotW = w - padding * 2;
+            const plotH = h - padding * 2;
+
+            const maxD = analysisParams.max_dist;
+            const maxL = Math.max(20, ...l_diff.map(v => Math.abs(v)));
+            const yAxisRange = maxL * 2.2;
+
+            const toScreenX = (d) => padding + (d / maxD) * plotW;
+            const toScreenY = (l) => padding + plotH / 2 - (l / yAxisRange) * plotH;
+            
+            lFunctionCtx.strokeStyle = '#475569';
+            lFunctionCtx.fillStyle = '#94a3b8';
+            lFunctionCtx.font = '11px Inter';
+            lFunctionCtx.lineWidth = 1;
+            
+            lFunctionCtx.beginPath();
+            lFunctionCtx.moveTo(padding, padding);
+            lFunctionCtx.lineTo(padding, h - padding);
+            lFunctionCtx.lineTo(w - padding, h - padding);
+            lFunctionCtx.stroke();
+
+            lFunctionCtx.textAlign = 'center';
+            lFunctionCtx.textBaseline = 'top';
+            for (let i = 0; i <= 5; i++) {
+                const val = (i / 5) * maxD;
+                const x = toScreenX(val);
+                lFunctionCtx.beginPath();
+                lFunctionCtx.moveTo(x, h - padding);
+                lFunctionCtx.lineTo(x, h - padding + 4);
+                lFunctionCtx.stroke();
+                lFunctionCtx.fillText(val.toFixed(0), x, h - padding + 8);
+            }
+
+            lFunctionCtx.textAlign = 'right';
+            lFunctionCtx.textBaseline = 'middle';
+            const yMaxAbs = yAxisRange / 2;
+            for (let i = -2; i <= 2; i++) {
+                 const val = i * (yMaxAbs / 2);
+                 const y = toScreenY(val);
+                 lFunctionCtx.beginPath();
+                 lFunctionCtx.moveTo(padding, y);
+                 lFunctionCtx.lineTo(padding - 4, y);
+                 lFunctionCtx.stroke();
+                 lFunctionCtx.fillText(val.toFixed(0), padding - 8, y);
+            }
+            
+            lFunctionCtx.textAlign = 'center';
+            lFunctionCtx.textBaseline = 'alphabetic';
+            lFunctionCtx.fillText('Distance d (µm)', padding + plotW / 2, h - 5);
+            lFunctionCtx.save();
+            lFunctionCtx.rotate(-Math.PI / 2);
+            lFunctionCtx.fillText('L(d) - d', -h / 2, 15);
+            lFunctionCtx.restore();
+
+            lFunctionCtx.strokeStyle = '#475569';
+            lFunctionCtx.setLineDash([4, 4]);
+            const yZero = toScreenY(0);
+            lFunctionCtx.beginPath();
+            lFunctionCtx.moveTo(padding, yZero);
+            lFunctionCtx.lineTo(w - padding, yZero);
+            lFunctionCtx.stroke();
+            lFunctionCtx.setLineDash([]);
+            
+            const path = new Path2D();
+            path.moveTo(toScreenX(d_range[0]), yZero);
+            for(let i=0; i<d_range.length; i++) path.lineTo(toScreenX(d_range[i]), toScreenY(l_diff[i]));
+            path.lineTo(toScreenX(d_range[d_range.length-1]), yZero);
+            
+            lFunctionCtx.save();
+            lFunctionCtx.clip(path);
+            lFunctionCtx.fillStyle = 'rgba(100, 255, 218, 0.1)';
+            lFunctionCtx.fillRect(0, 0, w, yZero);
+            lFunctionCtx.fillStyle = 'rgba(139, 92, 246, 0.1)';
+            lFunctionCtx.fillRect(0, yZero, w, h - yZero);
+            lFunctionCtx.restore();
+
+            lFunctionCtx.strokeStyle = '#64ffda';
+            lFunctionCtx.lineWidth = 2.5;
+            lFunctionCtx.shadowColor = '#64ffda';
+            lFunctionCtx.shadowBlur = 8;
+            lFunctionCtx.beginPath();
+            lFunctionCtx.moveTo(toScreenX(d_range[0]), toScreenY(l_diff[0]));
+            for (let i = 1; i < d_range.length; i++) {
+                lFunctionCtx.lineTo(toScreenX(d_range[i]), toScreenY(l_diff[i]));
+            }
+            lFunctionCtx.stroke();
+            lFunctionCtx.shadowBlur = 0;
+        }
+
+        // --- Main Execution Logic ---
+        function runSimulation() {
+            simParams.r_c = parseFloat(sliders.rc.value);
+            simParams.r_d = parseFloat(sliders.rd.value);
+            simParams.n_c = parseInt(sliders.nc.value);
+            simParams.n_d = parseInt(sliders.nd.value);
+            simParams.sigma = parseFloat(sliders.sigma.value);
+
+            if (simParams.r_d <= simParams.r_c) {
+                simParams.r_d = simParams.r_c + 10;
+                sliders.rd.value = simParams.r_d;
+            }
+
+            values.rc.textContent = `${simParams.r_c.toFixed(0)} µm`;
+            values.rd.textContent = `${simParams.r_d.toFixed(0)} µm`;
+            values.nc.textContent = `${simParams.n_c}`;
+            values.nd.textContent = `${simParams.n_d}`;
+            values.sigma.textContent = `${simParams.sigma.toFixed(0)}`;
+
+            const [plaque_coord, glia_coords] = generatePlaqueEnvironment(simParams);
+            const [d_range, l_diff] = analyzeSpatialPattern(glia_coords, simParams, analysisParams);
+            
+            drawScatterPlot(plaque_coord, glia_coords, simParams);
+            drawLFunctionPlot(d_range, l_diff);
+        }
+
+        function setup() {
+            const scatterContainer = scatterCanvas.parentElement;
+            const lFuncContainer = lFunctionCanvas.parentElement;
+            
+            const size = Math.min(scatterContainer.clientWidth, scatterContainer.clientHeight);
+            scatterCanvas.width = size; scatterCanvas.height = size;
+            lFunctionCanvas.width = size; lFunctionCanvas.height = size;
+
+            Object.values(sliders).forEach(s => s.addEventListener('input', runSimulation));
+            rerunButton.addEventListener('click', runSimulation);
+            
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => { setup(); runSimulation(); }, 250);
+            });
+
+            runSimulation();
+        }
+
+        window.onload = setup;
+
+    </script>
+</body>
+</html>
