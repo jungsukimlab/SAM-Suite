@@ -19,6 +19,12 @@ You can download the latest compiled, ready-to-use versions of all applications 
 
 ---
 
+## 🔬 Live Simulation
+Gain intuition about the biological meaning of a key readout from the SAM tool.
+* **[Interactive Ripley's L-Function Simulation](https://jungsukimlab.github.io/SAM-Suite/ripley-simulation.html)**: A tool to visualize how different glial spatial patterns (clustering, random dispersion, inhibition) produce unique `L(d) - d` curves.
+
+---
+
 ## 🛠️ Tools Included
 This suite currently includes the following tools, divided into preprocessing and analysis workflows.
 
