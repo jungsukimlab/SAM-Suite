@@ -1,3 +1,9 @@
+# S.A.M. - Spatial Analysis from Masks
+
+[![S.A.M. Hero Preview](https://github.com/<Aviiation>/<Sam-Suite>/blob/main/hero_preview.png?raw=true)](https://<Aviiation>.github.io/<Sam-Suite>/SAM_Hero_Image.gif)
+
+This is an interactive hero image created with HTML Canvas. **Click the image above to see the live version.**
+
 SAM - Spatial Analysis from Masks A suite of tools designed to streamline common image analysis tasks in scientific research. This suite currently includes the Mask Accuracy Verifier, File Renamer, and ROI Extractor.
 
 Downloads You can download the latest compiled, ready-to-use versions of all applications for macOS and Windows from the Releases Page.
